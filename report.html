@@ -26,6 +26,10 @@
         .sign-box { text-align: center; width: 45%; margin-bottom: 10px; }
         .dot-line { border-bottom: 1px dotted #000; width: 80%; display: inline-block; height: 1px; margin-bottom: 5px; }
         
+        /* Utility Classes for Status */
+        .status-win { font-weight: bold; color: #006400; } /* สีเขียวเข้ม */
+        .status-lose { color: #8B0000; } /* สีแดงเข้ม */
+        
         @media print { 
             body { background: white; padding: 0; }
             .toolbar { display: none; }
@@ -57,16 +61,16 @@
         <table>
             <thead>
                 <tr>
-                    <th width="20%">รอบที่</th>
+                    <th width="15%">รอบที่</th>
                     <th width="30%">ทีมสีเหลือง</th>
                     <th width="30%">ทีมสีฟ้า</th>
-                    <th width="20%">ผู้ชนะ</th>
+                    <th width="25%">ผู้ชนะ</th>
                 </tr>
             </thead>
             <tbody id="resultBody">
-                <tr><td>1</td><td>-</td><td>-</td><td id="res1">-</td></tr>
-                <tr><td>2</td><td>-</td><td>-</td><td id="res2">-</td></tr>
-                <tr><td>3</td><td>-</td><td>-</td><td id="res3">-</td></tr>
+                <tr><td>1</td><td id="y1">-</td><td id="b1">-</td><td id="res1">-</td></tr>
+                <tr><td>2</td><td id="y2">-</td><td id="b2">-</td><td id="res2">-</td></tr>
+                <tr><td>3</td><td id="y3">-</td><td id="b3">-</td><td id="res3">-</td></tr>
             </tbody>
         </table>
 
@@ -99,18 +103,16 @@
         onValue(ref(db, 'match_info'), (snap) => {
             const info = snap.val();
             if(info) {
-                // แสดงข้อมูลวันและระดับ
                 document.getElementById('matchInfoDisplay').innerHTML = `
                     <strong>วันที่แข่งขัน:</strong> ${info.date || '-'} &nbsp;&nbsp;
                     <strong>ระดับชั้น:</strong> ${info.level || '-'} &nbsp;&nbsp;
                     <strong>ประเภท:</strong> ${info.type || '-'}
                 `;
 
-                // สร้างลายเซ็นกรรมการ
+                // สร้างลายเซ็น
                 const signContainer = document.getElementById('signatureContainer');
-                signContainer.innerHTML = ''; // Clear old
+                signContainer.innerHTML = ''; 
 
-                // 1. ช่องเซ็นตัวแทนทีมชนะ
                 signContainer.innerHTML += `
                     <div class="sign-box">
                         <p>ลงชื่อผู้เข้าแข่งขัน (ตัวแทนทีมชนะ)</p>
@@ -120,7 +122,6 @@
                     </div>
                 `;
 
-                // 2. วนลูปสร้างช่องเซ็นกรรมการ
                 if(info.referees && info.referees.length > 0) {
                     info.referees.forEach(refName => {
                         signContainer.innerHTML += `
@@ -134,7 +135,6 @@
                         `;
                     });
                 } else {
-                    // ถ้าไม่มีกรรมการ ให้ใส่ชื่อครูนนทพัทธ์ เป็น Default
                     signContainer.innerHTML += `
                         <div class="sign-box">
                             <p>ลงชื่อกรรมการควบคุมการแข่งขัน</p>
@@ -148,18 +148,38 @@
             }
         });
 
-        // ดึงผลคะแนน
+        // ดึงผลคะแนน และเติมช่อง ชนะ/แพ้ อัตโนมัติ
         onValue(ref(db, 'match_result'), (snapshot) => {
             const res = snapshot.val();
             if(res) {
                 let yWin = 0; let bWin = 0;
+                
                 ['round1', 'round2', 'round3'].forEach((r, idx) => {
                     if(res[r]) {
-                        const w = (res[r] === 'yellow' ? 'ทีมสีเหลือง' : 'ทีมสีฟ้า');
-                        document.getElementById(`res${idx+1}`).innerText = w;
-                        if(res[r] === 'yellow') yWin++; else bWin++;
+                        // 1. แสดงชื่อผู้ชนะ
+                        const winnerText = (res[r] === 'yellow' ? 'ทีมสีเหลือง' : 'ทีมสีฟ้า');
+                        document.getElementById(`res${idx+1}`).innerText = winnerText;
+
+                        // 2. เติมคำว่า ชนะ/แพ้ ในตารางช่องกลาง
+                        const yCell = document.getElementById(`y${idx+1}`);
+                        const bCell = document.getElementById(`b${idx+1}`);
+                        
+                        if(res[r] === 'yellow') {
+                            yCell.innerText = "ชนะ";
+                            yCell.className = "status-win";
+                            bCell.innerText = "แพ้";
+                            bCell.className = "status-lose";
+                            yWin++;
+                        } else {
+                            yCell.innerText = "แพ้";
+                            yCell.className = "status-lose";
+                            bCell.innerText = "ชนะ";
+                            bCell.className = "status-win";
+                            bWin++;
+                        }
                     }
                 });
+
                 if(yWin >= 2) document.getElementById('finalWinner').innerText = "ทีมสีเหลือง";
                 else if(bWin >= 2) document.getElementById('finalWinner').innerText = "ทีมสีฟ้า";
             }
