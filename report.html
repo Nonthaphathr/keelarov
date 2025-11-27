@@ -8,62 +8,34 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         body { font-family: 'Sarabun', sans-serif; background: #555; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        
-        .toolbar {
-            width: 210mm;
-            background: #333;
-            color: white;
-            padding: 10px;
-            margin-bottom: 20px;
-            text-align: right;
-            border-radius: 5px;
-        }
-
+        .toolbar { width: 210mm; background: #333; color: white; padding: 10px; margin-bottom: 20px; text-align: right; border-radius: 5px; }
         .paper {
-            width: 210mm;
-            min-height: 297mm;
-            background: white;
-            padding: 25mm 20mm; /* A4 Margins */
-            box-shadow: 0 0 15px rgba(0,0,0,0.5);
-            position: relative;
-            box-sizing: border-box;
+            width: 210mm; min-height: 297mm; background: white; padding: 20mm 25mm;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5); position: relative; box-sizing: border-box;
         }
-
-        .header { text-align: center; margin-bottom: 40px; }
+        .header { text-align: center; margin-bottom: 30px; }
         .logo { width: 80px; margin-bottom: 15px; }
         h3, h4 { margin: 5px 0; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 30px; margin-bottom: 30px; }
-        th, td { border: 1px solid #000; padding: 12px; text-align: center; font-size: 16px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 20px; }
+        th, td { border: 1px solid #000; padding: 10px; text-align: center; font-size: 16px; }
         th { background: #f0f0f0; font-weight: bold; }
+        .info-section p { margin: 5px 0; font-size: 16px; }
+        .result-summary { font-size: 18px; font-weight: bold; margin-top: 20px; border: 2px solid #000; padding: 10px; text-align: center; }
         
-        .info-section p { margin: 8px 0; font-size: 16px; }
-        .result-summary { font-size: 18px; font-weight: bold; margin-top: 20px; }
+        .sign-area { margin-top: 50px; display: flex; flex-wrap: wrap; justify-content: space-between; row-gap: 40px; }
+        .sign-box { text-align: center; width: 45%; margin-bottom: 10px; }
+        .dot-line { border-bottom: 1px dotted #000; width: 80%; display: inline-block; height: 1px; margin-bottom: 5px; }
         
-        .sign-area { 
-            margin-top: 80px; 
-            display: flex; 
-            justify-content: space-between; 
-            page-break-inside: avoid;
-        }
-        .sign-box { text-align: center; width: 45%; }
-        .dot-line { border-bottom: 1px dotted #000; width: 100%; display: inline-block; height: 1px; margin-bottom: 5px;}
-        
-        /* ซ่อนปุ่มตอน Print ปกติ */
         @media print { 
             body { background: white; padding: 0; }
             .toolbar { display: none; }
-            .paper { box-shadow: none; margin: 0; width: 100%; }
+            .paper { box-shadow: none; margin: 0; width: 100%; padding: 0; }
         }
     </style>
 </head>
 <body>
-
     <div class="toolbar">
-        <span>หน้าสรุปผลการแข่งขัน</span>
-        <button onclick="exportPDF()" style="padding: 8px 20px; background: #dc3545; color: white; border: none; cursor: pointer; margin-left: 10px; border-radius: 4px; font-family: 'Sarabun';">
-            ดาวน์โหลดเป็น PDF
-        </button>
+        <button onclick="exportPDF()" style="padding: 8px 20px; background: #dc3545; color: white; border: none; cursor: pointer; border-radius: 4px;">ดาวน์โหลด PDF</button>
     </div>
 
     <div class="paper" id="reportContent">
@@ -75,19 +47,20 @@
         </div>
 
         <div class="info-section">
-            <p><strong>คู่แข่งขัน:</strong> สีเหลือง พบ สีฟ้า</p>
-            <p><strong>ประเภท:</strong> ทีม (Best of 3)</p>
-            <p id="matchDateDisplay"><strong>วันที่แข่งขัน:</strong> ........................................</p>
-            <p id="matchLevelDisplay"><strong>ระดับชั้น:</strong> ........................................</p>
+            <p><strong>คู่แข่งขัน:</strong> ทีมสีเหลือง พบ ทีมสีฟ้า</p>
+            <p><strong>รูปแบบการแข่งขัน:</strong> ทีม (Best of 3)</p>
+            <p id="matchInfoDisplay">
+                Loading Info...
+            </p>
         </div>
 
         <table>
             <thead>
                 <tr>
-                    <th width="15%">รอบที่</th>
-                    <th width="35%">สีเหลือง</th>
-                    <th width="35%">สีฟ้า</th>
-                    <th width="15%">ผู้ชนะ</th>
+                    <th width="20%">รอบที่</th>
+                    <th width="30%">ทีมสีเหลือง</th>
+                    <th width="30%">ทีมสีฟ้า</th>
+                    <th width="20%">ผู้ชนะ</th>
                 </tr>
             </thead>
             <tbody id="resultBody">
@@ -101,21 +74,8 @@
             สรุปผลการแข่งขัน: ทีมชนะเลิศ ได้แก่ <span id="finalWinner" style="color: blue; text-decoration: underline;">รอผลการแข่งขัน...</span>
         </div>
 
-        <div class="sign-area">
-            <div class="sign-box">
-                <p>ลงชื่อผู้เข้าแข่งขัน (ตัวแทนทีมชนะ)</p>
-                <div style="margin-top: 30px;"></div>
-                <span class="dot-line"></span>
-                <p>(..........................................................)</p>
+        <div class="sign-area" id="signatureContainer">
             </div>
-            <div class="sign-box">
-                <p>ลงชื่อกรรมการควบคุมการแข่งขัน</p>
-                <div style="margin-top: 30px;"></div>
-                <span class="dot-line"></span>
-                <p>(นายนนทพัทธ์ หิรัญเรือง)</p>
-                <p>ตำแหน่ง ครูผู้รับผิดชอบโครงการ</p>
-            </div>
-        </div>
     </div>
 
     <script type="module">
@@ -135,47 +95,80 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // ดึงข้อมูลผลการแข่ง
+        // ดึงข้อมูล Match Info & Referees
+        onValue(ref(db, 'match_info'), (snap) => {
+            const info = snap.val();
+            if(info) {
+                // แสดงข้อมูลวันและระดับ
+                document.getElementById('matchInfoDisplay').innerHTML = `
+                    <strong>วันที่แข่งขัน:</strong> ${info.date || '-'} &nbsp;&nbsp;
+                    <strong>ระดับชั้น:</strong> ${info.level || '-'} &nbsp;&nbsp;
+                    <strong>ประเภท:</strong> ${info.type || '-'}
+                `;
+
+                // สร้างลายเซ็นกรรมการ
+                const signContainer = document.getElementById('signatureContainer');
+                signContainer.innerHTML = ''; // Clear old
+
+                // 1. ช่องเซ็นตัวแทนทีมชนะ
+                signContainer.innerHTML += `
+                    <div class="sign-box">
+                        <p>ลงชื่อผู้เข้าแข่งขัน (ตัวแทนทีมชนะ)</p>
+                        <div style="margin-top: 30px;"></div>
+                        <span class="dot-line"></span>
+                        <p>(..........................................................)</p>
+                    </div>
+                `;
+
+                // 2. วนลูปสร้างช่องเซ็นกรรมการ
+                if(info.referees && info.referees.length > 0) {
+                    info.referees.forEach(refName => {
+                        signContainer.innerHTML += `
+                            <div class="sign-box">
+                                <p>ลงชื่อกรรมการตัดสิน</p>
+                                <div style="margin-top: 30px;"></div>
+                                <span class="dot-line"></span>
+                                <p>(${refName})</p>
+                                <p>ตำแหน่ง กรรมการผู้ตัดสินกีฬา E-Sports</p>
+                            </div>
+                        `;
+                    });
+                } else {
+                    // ถ้าไม่มีกรรมการ ให้ใส่ชื่อครูนนทพัทธ์ เป็น Default
+                    signContainer.innerHTML += `
+                        <div class="sign-box">
+                            <p>ลงชื่อกรรมการควบคุมการแข่งขัน</p>
+                            <div style="margin-top: 30px;"></div>
+                            <span class="dot-line"></span>
+                            <p>(นายนนทพัทธ์ หิรัญเรือง)</p>
+                            <p>ตำแหน่ง ครูผู้รับผิดชอบโครงการ</p>
+                        </div>
+                    `;
+                }
+            }
+        });
+
+        // ดึงผลคะแนน
         onValue(ref(db, 'match_result'), (snapshot) => {
             const res = snapshot.val();
             if(res) {
-                let yWin = 0;
-                let bWin = 0;
-                
+                let yWin = 0; let bWin = 0;
                 ['round1', 'round2', 'round3'].forEach((r, idx) => {
                     if(res[r]) {
-                        const winnerText = (res[r] === 'yellow' ? 'สีเหลือง' : 'สีฟ้า');
-                        document.getElementById(`res${idx+1}`).innerText = winnerText;
+                        const w = (res[r] === 'yellow' ? 'ทีมสีเหลือง' : 'ทีมสีฟ้า');
+                        document.getElementById(`res${idx+1}`).innerText = w;
                         if(res[r] === 'yellow') yWin++; else bWin++;
                     }
                 });
-
-                if(yWin >= 2) document.getElementById('finalWinner').innerText = "คณะสีเหลือง";
-                else if(bWin >= 2) document.getElementById('finalWinner').innerText = "คณะสีฟ้า";
-            }
-        });
-        
-        // ดึงวันที่และระดับชั้น (ดึงจากทีมสีเหลืองเป็นหลัก)
-        onValue(ref(db, 'teams/yellow'), (snap) => {
-            const data = snap.val();
-            if(data) {
-                if(data.date) document.getElementById('matchDateDisplay').innerHTML = `<strong>วันที่แข่งขัน:</strong> ${data.date}`;
-                if(data.level) document.getElementById('matchLevelDisplay').innerHTML = `<strong>ระดับชั้น:</strong> ${data.level}`;
+                if(yWin >= 2) document.getElementById('finalWinner').innerText = "ทีมสีเหลือง";
+                else if(bWin >= 2) document.getElementById('finalWinner').innerText = "ทีมสีฟ้า";
             }
         });
     </script>
-
     <script>
         function exportPDF() {
             const element = document.getElementById('reportContent');
-            const opt = {
-                margin: 0,
-                filename: 'ROV_Match_Result.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-            html2pdf().set(opt).from(element).save();
+            html2pdf().set({ margin: 0, filename: 'ROV_Result.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4' } }).from(element).save();
         }
     </script>
 </body>
