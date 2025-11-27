@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ลงทะเบียน E-Sports - โรงเรียนกระดุมทองวิทยา</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body { font-family: 'Kanit', sans-serif; background: #1a1a1a; color: white; }
+        .card { background: #2d2d2d; border: 1px solid #ffd700; box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); }
+        .btn-gold { background: linear-gradient(45deg, #FFD700, #FFA500); border: none; font-weight: bold; color: #000; }
+        .logo { width: 100px; display: block; margin: 0 auto 20px; }
+        a { text-decoration: none; }
+    </style>
+</head>
+<body class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card p-4">
+                    <img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" class="logo">
+                    <h3 class="text-center mb-4">ใบสมัครเข้าร่วมแข่งขัน E-Sports (ROV)</h3>
+                    <h5 class="text-center text-warning">กิจกรรมกีฬาภายใน โรงเรียนกระดุมทองวิทยา</h5>
+                    <p class="text-center text-muted small">พัฒนาโดย ครูนนทพัทธ์ หิรัญเรือง</p>
+                    
+                    <form id="regForm">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label>วันที่แข่งขัน</label>
+                                <input type="date" class="form-control" id="matchDate" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label>คณะสี</label>
+                                <select class="form-select" id="teamColor" required>
+                                    <option value="" selected disabled>-- เลือกสี --</option>
+                                    <option value="yellow">สีเหลือง</option>
+                                    <option value="blue">สีฟ้า</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label>ระดับชั้น</label>
+                            <select class="form-select" id="level" required>
+                                <option value="ม.ต้น">มัธยมศึกษาตอนต้น</option>
+                                <option value="ม.ปลาย">มัธยมศึกษาตอนปลาย</option>
+                            </select>
+                        </div>
+                        
+                        <hr class="border-warning">
+                        <h5>รายชื่อผู้เข้าแข่งขัน (ตัวจริง 5 คน)</h5>
+                        <div id="playersContainer">
+                            </div>
+
+                        <h5 class="mt-3">ตัวสำรอง <button type="button" class="btn btn-sm btn-outline-warning" onclick="addSub()">+ เพิ่ม</button></h5>
+                        <div id="subsContainer"></div>
+
+                        <button type="submit" class="btn btn-gold w-100 mt-4">บันทึกข้อมูลการสมัคร</button>
+                    </form>
+
+                    <div class="mt-4 text-center border-top border-secondary pt-3">
+                        <p class="text-muted small">เมนูสำหรับเจ้าหน้าที่/กรรมการ</p>
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="match.html" class="btn btn-outline-danger btn-sm">
+                                🎮 ไปหน้ากระดานคะแนน (Match)
+                            </a>
+                            <a href="report.html" class="btn btn-outline-info btn-sm">
+                                📄 ไปหน้ารายงานผล (Report)
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAAW6t1cnskXOF6mbQTI9jwHQ2FFurkVqo",
+            authDomain: "kradumthong-esports.firebaseapp.com",
+            databaseURL: "https://kradumthong-esports-default-rtdb.firebaseio.com",
+            projectId: "kradumthong-esports",
+            storageBucket: "kradumthong-esports.firebasestorage.app",
+            messagingSenderId: "297783930970",
+            appId: "1:297783930970:web:8addc3c392708a07c52863"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // สร้างช่องกรอกชื่อ 5 คน
+        const pContainer = document.getElementById('playersContainer');
+        for(let i=1; i<=5; i++){
+            pContainer.innerHTML += `<input type="text" class="form-control mb-2" placeholder="ชื่อ-สกุล ผู้เล่นที่ ${i}" id="p${i}" required>`;
+        }
+
+        // ฟังก์ชันเพิ่มตัวสำรอง (Global scope)
+        window.addSub = () => {
+            const div = document.createElement('input');
+            div.className = "form-control mb-2";
+            div.placeholder = "ชื่อ-สกุล ตัวสำรอง";
+            div.name = "subPlayer";
+            document.getElementById('subsContainer').appendChild(div);
+        }
+
+        // บันทึกข้อมูล
+        document.getElementById('regForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const color = document.getElementById('teamColor').value;
+            const players = [];
+            for(let i=1; i<=5; i++) players.push(document.getElementById(`p${i}`).value);
+            
+            const subs = [];
+            document.getElementsByName('subPlayer').forEach(el => { if(el.value) subs.push(el.value) });
+
+            set(ref(db, 'teams/' + color), {
+                date: document.getElementById('matchDate').value,
+                level: document.getElementById('level').value,
+                players: players,
+                subs: subs,
+                timestamp: Date.now()
+            }).then(() => {
+                Swal.fire({
+                    title: 'บันทึกสำเร็จ!',
+                    text: 'ข้อมูลทีม ' + (color=='yellow'?'สีเหลือง':'สีฟ้า') + ' ถูกบันทึกเรียบร้อย',
+                    icon: 'success',
+                    confirmButtonColor: '#FFD700'
+                });
+            }).catch((error) => {
+                Swal.fire('Error', error.message, 'error');
+            });
+        });
+    </script>
+</body>
+</html>

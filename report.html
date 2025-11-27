@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สรุปผลการแข่งขัน - Print Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background: #555; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        
+        .toolbar {
+            width: 210mm;
+            background: #333;
+            color: white;
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: right;
+            border-radius: 5px;
+        }
+
+        .paper {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            padding: 25mm 20mm; /* A4 Margins */
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .header { text-align: center; margin-bottom: 40px; }
+        .logo { width: 80px; margin-bottom: 15px; }
+        h3, h4 { margin: 5px 0; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 30px; margin-bottom: 30px; }
+        th, td { border: 1px solid #000; padding: 12px; text-align: center; font-size: 16px; }
+        th { background: #f0f0f0; font-weight: bold; }
+        
+        .info-section p { margin: 8px 0; font-size: 16px; }
+        .result-summary { font-size: 18px; font-weight: bold; margin-top: 20px; }
+        
+        .sign-area { 
+            margin-top: 80px; 
+            display: flex; 
+            justify-content: space-between; 
+            page-break-inside: avoid;
+        }
+        .sign-box { text-align: center; width: 45%; }
+        .dot-line { border-bottom: 1px dotted #000; width: 100%; display: inline-block; height: 1px; margin-bottom: 5px;}
+        
+        /* ซ่อนปุ่มตอน Print ปกติ */
+        @media print { 
+            body { background: white; padding: 0; }
+            .toolbar { display: none; }
+            .paper { box-shadow: none; margin: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toolbar">
+        <span>หน้าสรุปผลการแข่งขัน</span>
+        <button onclick="exportPDF()" style="padding: 8px 20px; background: #dc3545; color: white; border: none; cursor: pointer; margin-left: 10px; border-radius: 4px; font-family: 'Sarabun';">
+            ดาวน์โหลดเป็น PDF
+        </button>
+    </div>
+
+    <div class="paper" id="reportContent">
+        <div class="header">
+            <img src="https://nonthaphathr.github.io/uploadimg/logoschool.png" class="logo">
+            <h3>รายงานผลการแข่งขันกีฬาอีสปอร์ต (E-Sports)</h3>
+            <h4>รายการ Arena of Valor : ROV</h4>
+            <p>กิจกรรมการแข่งขันกีฬาภายใน โรงเรียนกระดุมทองวิทยา</p>
+        </div>
+
+        <div class="info-section">
+            <p><strong>คู่แข่งขัน:</strong> สีเหลือง พบ สีฟ้า</p>
+            <p><strong>ประเภท:</strong> ทีม (Best of 3)</p>
+            <p id="matchDateDisplay"><strong>วันที่แข่งขัน:</strong> ........................................</p>
+            <p id="matchLevelDisplay"><strong>ระดับชั้น:</strong> ........................................</p>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th width="15%">รอบที่</th>
+                    <th width="35%">สีเหลือง</th>
+                    <th width="35%">สีฟ้า</th>
+                    <th width="15%">ผู้ชนะ</th>
+                </tr>
+            </thead>
+            <tbody id="resultBody">
+                <tr><td>1</td><td>-</td><td>-</td><td id="res1">-</td></tr>
+                <tr><td>2</td><td>-</td><td>-</td><td id="res2">-</td></tr>
+                <tr><td>3</td><td>-</td><td>-</td><td id="res3">-</td></tr>
+            </tbody>
+        </table>
+
+        <div class="result-summary">
+            สรุปผลการแข่งขัน: ทีมชนะเลิศ ได้แก่ <span id="finalWinner" style="color: blue; text-decoration: underline;">รอผลการแข่งขัน...</span>
+        </div>
+
+        <div class="sign-area">
+            <div class="sign-box">
+                <p>ลงชื่อผู้เข้าแข่งขัน (ตัวแทนทีมชนะ)</p>
+                <div style="margin-top: 30px;"></div>
+                <span class="dot-line"></span>
+                <p>(..........................................................)</p>
+            </div>
+            <div class="sign-box">
+                <p>ลงชื่อกรรมการควบคุมการแข่งขัน</p>
+                <div style="margin-top: 30px;"></div>
+                <span class="dot-line"></span>
+                <p>(นายนนทพัทธ์ หิรัญเรือง)</p>
+                <p>ตำแหน่ง ครูผู้รับผิดชอบโครงการ</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAAW6t1cnskXOF6mbQTI9jwHQ2FFurkVqo",
+            authDomain: "kradumthong-esports.firebaseapp.com",
+            databaseURL: "https://kradumthong-esports-default-rtdb.firebaseio.com",
+            projectId: "kradumthong-esports",
+            storageBucket: "kradumthong-esports.firebasestorage.app",
+            messagingSenderId: "297783930970",
+            appId: "1:297783930970:web:8addc3c392708a07c52863"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // ดึงข้อมูลผลการแข่ง
+        onValue(ref(db, 'match_result'), (snapshot) => {
+            const res = snapshot.val();
+            if(res) {
+                let yWin = 0;
+                let bWin = 0;
+                
+                ['round1', 'round2', 'round3'].forEach((r, idx) => {
+                    if(res[r]) {
+                        const winnerText = (res[r] === 'yellow' ? 'สีเหลือง' : 'สีฟ้า');
+                        document.getElementById(`res${idx+1}`).innerText = winnerText;
+                        if(res[r] === 'yellow') yWin++; else bWin++;
+                    }
+                });
+
+                if(yWin >= 2) document.getElementById('finalWinner').innerText = "คณะสีเหลือง";
+                else if(bWin >= 2) document.getElementById('finalWinner').innerText = "คณะสีฟ้า";
+            }
+        });
+        
+        // ดึงวันที่และระดับชั้น (ดึงจากทีมสีเหลืองเป็นหลัก)
+        onValue(ref(db, 'teams/yellow'), (snap) => {
+            const data = snap.val();
+            if(data) {
+                if(data.date) document.getElementById('matchDateDisplay').innerHTML = `<strong>วันที่แข่งขัน:</strong> ${data.date}`;
+                if(data.level) document.getElementById('matchLevelDisplay').innerHTML = `<strong>ระดับชั้น:</strong> ${data.level}`;
+            }
+        });
+    </script>
+
+    <script>
+        function exportPDF() {
+            const element = document.getElementById('reportContent');
+            const opt = {
+                margin: 0,
+                filename: 'ROV_Match_Result.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+</body>
+</html>
