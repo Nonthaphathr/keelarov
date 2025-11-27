@@ -7,57 +7,30 @@
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@800&display=swap" rel="stylesheet">
     <style>
         body {
-            margin: 0;
-            background: #000;
-            color: #fff;
-            font-family: 'Kanit', sans-serif;
-            overflow: hidden;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
+            margin: 0; background: #000; color: #fff;
+            font-family: 'Kanit', sans-serif; overflow: hidden;
+            height: 100vh; display: flex; flex-direction: column;
         }
-        /* Layout */
-        .arena-container {
-            display: flex;
-            height: 85vh;
-            position: relative;
-        }
+        .arena-container { display: flex; height: 85vh; position: relative; }
         .team-panel {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-            padding-bottom: 50px;
+            flex: 1; position: relative; overflow: hidden;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: flex-end; padding-bottom: 50px;
         }
         
-        /* Team Yellow Style */
-        .team-yellow {
-            background: linear-gradient(to right, #222, #443300);
-            border-right: 5px solid #FFD700;
-        }
+        /* Team Yellow */
+        .team-yellow { background: linear-gradient(to right, #222, #443300); border-right: 5px solid #FFD700; }
         .team-yellow h1 { color: #FFD700; text-shadow: 0 0 20px #FFD700; font-size: 3rem; margin-bottom: 10px; z-index: 5; }
         .team-yellow ul { color: #fff; z-index: 5; font-size: 1.2rem; }
         
-        /* Team Blue Style */
-        .team-blue {
-            background: linear-gradient(to left, #222, #002244);
-            border-left: 5px solid #00FFFF;
-        }
+        /* Team Blue */
+        .team-blue { background: linear-gradient(to left, #222, #002244); border-left: 5px solid #00FFFF; }
         .team-blue h1 { color: #00FFFF; text-shadow: 0 0 20px #00FFFF; font-size: 3rem; margin-bottom: 10px; z-index: 5; }
         .team-blue ul { color: #fff; z-index: 5; font-size: 1.2rem; }
 
-        /* Images & Effects */
         .char-img {
-            height: 85%;
-            object-fit: contain;
-            z-index: 2;
-            position: absolute;
-            bottom: 0;
-            transition: transform 0.3s;
-            filter: drop-shadow(0 0 20px rgba(0,0,0,0.8));
+            height: 85%; object-fit: contain; z-index: 2; position: absolute; bottom: 0;
+            transition: transform 0.3s; filter: drop-shadow(0 0 20px rgba(0,0,0,0.8));
         }
         .team-yellow .char-img { left: -50px; animation: breathe 3s infinite ease-in-out; }
         .team-blue .char-img { right: -50px; transform: scaleX(-1); animation: breatheReverse 3s infinite ease-in-out; }
@@ -65,90 +38,49 @@
         @keyframes breathe { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
         @keyframes breatheReverse { 0% { transform: scaleX(-1) scale(1); } 50% { transform: scaleX(-1) scale(1.02); } 100% { transform: scaleX(-1) scale(1); } }
 
-        /* VS & Timer Center */
-        .center-panel {
-            position: absolute;
-            left: 50%;
-            top: 40%;
-            transform: translate(-50%, -50%);
-            z-index: 10;
-            text-align: center;
-        }
+        .center-panel { position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%); z-index: 10; text-align: center; }
         .vs-text {
-            font-size: 8rem;
-            font-style: italic;
+            font-size: 8rem; font-style: italic;
             background: -webkit-linear-gradient(#FF0000, #800000);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             filter: drop-shadow(0 0 10px rgba(255,0,0,0.8));
         }
         .timer-box {
-            font-size: 4rem;
-            background: rgba(0,0,0,0.9);
-            border: 3px solid white;
-            padding: 10px 40px;
-            border-radius: 15px;
-            margin-bottom: 20px;
+            font-size: 4rem; background: rgba(0,0,0,0.9); border: 3px solid white;
+            padding: 10px 40px; border-radius: 15px; margin-bottom: 20px;
             box-shadow: 0 0 20px rgba(255,255,255,0.2);
         }
 
-        /* Controls Footer */
         .control-panel {
-            height: 15vh;
-            background: #111;
-            border-top: 2px solid #555;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            z-index: 20;
+            height: 15vh; background: #111; border-top: 2px solid #555;
+            display: flex; justify-content: center; align-items: center; gap: 20px; z-index: 20;
         }
-        .btn-control {
-            padding: 10px 25px;
-            font-size: 1.2rem;
-            font-family: 'Kanit';
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-        .score-board {
-            display: flex; gap: 15px; font-size: 1.5rem; align-items: center; background: #222; padding: 10px 20px; border-radius: 10px;
-        }
-        .score-dot {
-            width: 25px; height: 25px; border-radius: 50%; background: #444; border: 2px solid #666; transition: all 0.3s;
-        }
+        .btn-control { padding: 10px 25px; font-size: 1.2rem; font-family: 'Kanit'; cursor: pointer; border: none; border-radius: 5px; font-weight: bold; }
+        .score-board { display: flex; gap: 15px; font-size: 1.5rem; align-items: center; background: #222; padding: 10px 20px; border-radius: 10px; }
+        .score-dot { width: 25px; height: 25px; border-radius: 50%; background: #444; border: 2px solid #666; transition: all 0.3s; }
         .score-dot.win-y { background: #FFD700; box-shadow: 0 0 15px #FFD700; border-color: #fff; }
         .score-dot.win-b { background: #00FFFF; box-shadow: 0 0 15px #00FFFF; border-color: #fff; }
-
-        /* Effects */
         .sparks {
             position: absolute; width: 100%; height: 100%; pointer-events: none;
-            background-image: radial-gradient(white, rgba(0,0,0,0) 2px);
-            background-size: 60px 60px; opacity: 0.15;
+            background-image: radial-gradient(white, rgba(0,0,0,0) 2px); background-size: 60px 60px; opacity: 0.15;
         }
     </style>
 </head>
 <body>
-
     <div class="arena-container">
         <div class="team-panel team-yellow">
             <div class="sparks"></div>
             <img src="https://nonthaphathr.github.io/uploadimg/keela1.png" class="char-img">
-            <h1 id="nameY">YELLOW</h1>
-            <ul id="listY" style="list-style: none; text-align: center; padding: 0;">Loading...</ul>
+            <h1 id="nameY">ทีมสีเหลือง</h1> <ul id="listY" style="list-style: none; text-align: center; padding: 0;">Loading...</ul>
         </div>
-
         <div class="center-panel">
             <div class="timer-box" id="timer">00:00</div>
             <div class="vs-text">VS</div>
         </div>
-
         <div class="team-panel team-blue">
             <div class="sparks"></div>
             <img src="https://nonthaphathr.github.io/uploadimg/keela2.png" class="char-img">
-            <h1 id="nameB">BLUE</h1>
-            <ul id="listB" style="list-style: none; text-align: center; padding: 0;">Loading...</ul>
+            <h1 id="nameB">ทีมสีฟ้า</h1> <ul id="listB" style="list-style: none; text-align: center; padding: 0;">Loading...</ul>
         </div>
     </div>
 
@@ -158,7 +90,6 @@
             <button class="btn-control" style="background:#dc3545; color:white;" onclick="stopTimer()">Stop</button>
             <button class="btn-control" style="background:#6c757d; color:white;" onclick="resetTimer()">Reset</button>
         </div>
-        
         <div class="score-board">
             <span style="color:#FFD700">YEL</span>
             <div id="r1" class="score-dot"></div>
@@ -166,13 +97,11 @@
             <div id="r3" class="score-dot"></div>
             <span style="color:#00FFFF">BLU</span>
         </div>
-
         <div style="background: #333; padding: 5px 15px; border-radius: 5px;">
             <span style="color:#aaa; font-size: 0.9rem;">Winner Round:</span>
             <button class="btn-control" onclick="setWinner('yellow')" style="background:#FFD700; color:black; padding: 5px 15px;">Y</button>
             <button class="btn-control" onclick="setWinner('blue')" style="background:#00FFFF; color:black; padding: 5px 15px;">B</button>
         </div>
-        
         <a href="report.html" target="_blank" class="btn-control" style="background:white; color:black; text-decoration:none;">จบการแข่งขัน (Report)</a>
     </div>
 
@@ -193,80 +122,41 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // ดึงข้อมูลทีมมาแสดง
         onValue(ref(db, 'teams'), (snapshot) => {
             const data = snapshot.val();
             if(data) {
-                if(data.yellow) {
+                if(data.yellow && data.yellow.players) {
                     let html = '';
-                    if(data.yellow.players) data.yellow.players.forEach(p => html += `<li>${p}</li>`);
+                    data.yellow.players.forEach(p => html += `<li>${p}</li>`);
                     document.getElementById('listY').innerHTML = html;
-                } else {
-                    document.getElementById('listY').innerHTML = '<li>รอลงทะเบียน...</li>';
                 }
-
-                if(data.blue) {
+                if(data.blue && data.blue.players) {
                     let html = '';
-                    if(data.blue.players) data.blue.players.forEach(p => html += `<li>${p}</li>`);
+                    data.blue.players.forEach(p => html += `<li>${p}</li>`);
                     document.getElementById('listB').innerHTML = html;
-                } else {
-                    document.getElementById('listB').innerHTML = '<li>รอลงทะเบียน...</li>';
                 }
             }
         });
 
-        // --- ระบบจับเวลา ---
         let time = 0;
         let interval;
-        
-        window.startTimer = () => {
-            clearInterval(interval);
-            interval = setInterval(() => {
-                time++;
-                updateTimerDisplay();
-            }, 1000);
-        };
-        
+        window.startTimer = () => { clearInterval(interval); interval = setInterval(() => { time++; updateTimerDisplay(); }, 1000); };
         window.stopTimer = () => clearInterval(interval);
-        
-        window.resetTimer = () => {
-            stopTimer();
-            time = 0;
-            updateTimerDisplay();
-        }
-
+        window.resetTimer = () => { stopTimer(); time = 0; updateTimerDisplay(); }
         function updateTimerDisplay() {
             let m = Math.floor(time / 60).toString().padStart(2,'0');
             let s = (time % 60).toString().padStart(2,'0');
             document.getElementById('timer').innerText = `${m}:${s}`;
         }
 
-        // --- ระบบให้คะแนน ---
         let round = 1;
         const scores = { 1: null, 2: null, 3: null };
-
         window.setWinner = (color) => {
-            if(round > 3) {
-                alert('การแข่งขันครบ 3 รอบแล้ว (กด Refresh หน้าเว็บหากต้องการเริ่มใหม่)');
-                return;
-            }
-            
-            // อัปเดตตัวแปร local
+            if(round > 3) return alert('ครบ 3 รอบแล้ว');
             scores[round] = color;
-            
-            // เปลี่ยนสีวงกลม
             const dot = document.getElementById(`r${round}`);
             dot.className = `score-dot ${color === 'yellow' ? 'win-y' : 'win-b'}`;
-            
-            // บันทึกผลลง Firebase
-            update(ref(db, 'match_result'), {
-                [`round${round}`]: color,
-                completed: (round === 3)
-            });
-
-            // ตรวจสอบว่าชนะ 2 ใน 3 หรือยัง เพื่อหยุดเกม (Option)
-            // แต่ตามโจทย์ให้แข่ง 3 รอบ ก็ปล่อยให้กดได้ถึง 3
-            
+            update(ref(db, 'match_result'), { [`round${round}`]: color, completed: (round === 3) });
             round++;
         };
     </script>
